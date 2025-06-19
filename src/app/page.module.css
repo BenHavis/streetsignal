@@ -1,0 +1,46 @@
+.mainPanel {
+  padding: 100px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  background: #f3f4f6;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.heading {
+  font-size: 2.75rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.subtext {
+  font-size: 1.2rem;
+  color: #4b5563;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.button {
+  display: inline-block;
+  background-color: #2563eb;
+  color: white;
+  padding: 14px 32px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: #3b82f6;
+}
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e5e7eb;
+}

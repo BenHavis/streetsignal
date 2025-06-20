@@ -1,6 +1,6 @@
-// app/layout.tsx
 import './globals.css';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'StreetSignal',
@@ -12,7 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <header>
-          <h1 className="app-header">StreetSignal</h1>
+          <Link href="/" className="app-header">
+            StreetSignal
+          </Link>
         </header>
         <main>{children}</main>
       </body>

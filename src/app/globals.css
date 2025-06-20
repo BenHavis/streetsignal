@@ -38,6 +38,16 @@ a {
   text-decoration: none;
 }
 
+.app-header {
+  display: inline-block;
+  padding: 20px;
+  font-size: 1.6rem;
+  font-weight: bold;
+   color: white;
+  text-decoration: none;
+}
+
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

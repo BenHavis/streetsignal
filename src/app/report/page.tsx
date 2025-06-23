@@ -1,4 +1,6 @@
 // src/app/report/page.tsx
+'use client';
+
 export default function ReportPage() {
   return (
     <div style={{ padding: '2rem' }}>

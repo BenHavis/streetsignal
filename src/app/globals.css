@@ -46,6 +46,10 @@ a {
    color: white;
   text-decoration: none;
 }
+header {
+  background-color: #111827; /* Tailwind 'gray-900' */
+}
+
 
 
 @media (prefers-color-scheme: dark) {

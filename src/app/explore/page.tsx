@@ -1,10 +1,11 @@
-// src/app/explore/page.tsx
+'use client'
+
 import dynamic from 'next/dynamic';
 import styles from './explore.module.css';
 
-import ExploreMap from '@/components/exploremap';
-
-// Dynamically import the client-only map
+const ExploreMap = dynamic(() => import('@/components/ExploreMap.client'), {
+  ssr: false,
+});
 
 export default function ExplorePage() {
   return (

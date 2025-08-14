@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-
+import styles from './report.module.css'
 type Category = 'Road' | 'Lighting' | 'Safety' | 'Sanitation' | 'Accessibility' | 'Other';
 const CATEGORIES: Category[] = ['Road', 'Lighting', 'Safety', 'Sanitation', 'Accessibility', 'Other'];
 
@@ -38,14 +38,15 @@ export default function ReportPage() {
   }
 
   return (
-    <main style={{ padding: 16, maxWidth: 720, margin: '0 auto' }}>
-      <h1>Report an issue</h1>
+    <main className={styles.container}>
+      <h1 className={styles.title}>Report an issue</h1>
 
-      <form onSubmit={onSubmit}>
+     <form className={styles.form} onSubmit={onSubmit}>
         {/* Title */}
-        <div>
-          <label htmlFor="title">Title</label>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="title">Title</label>
           <input
+            className={styles.input}
             id="title"
             type="text"
             placeholder="Pothole on Elm Street"
@@ -56,9 +57,10 @@ export default function ReportPage() {
         </div>
 
         {/* Category */}
-        <div>
-          <label htmlFor="category">Category</label>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="category">Category</label>
           <select
+            className={styles.select}
             id="category"
             value={category}
             onChange={(e) => setCategory(e.target.value as Category)}
@@ -70,9 +72,10 @@ export default function ReportPage() {
         </div>
 
         {/* Description */}
-        <div>
-          <label htmlFor="description">Description</label>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="description">Description</label>
           <textarea
+            className={styles.textarea}
             id="description"
             placeholder="Large pothole in right lane near crosswalk"
             rows={4}
@@ -82,57 +85,59 @@ export default function ReportPage() {
         </div>
 
         {/* Location inputs */}
-        <div>
-          <label>Location</label>
+        <div className={styles.field}>
+          <label className={styles.label}>Location</label>
 
-          <div>
-            <button type="button" onClick={useMyLocation}>
-              Use my location
+          <div className={styles.locationSection}>
+            <button type="button" className={styles.locationButton} onClick={useMyLocation}>
+              📍 Use my location
             </button>
-          </div>
 
-          <div>
-            <input
-              type="number"
-              step="any"
-              placeholder="Latitude"
-              value={lat ?? ''}
-              onChange={(e) => setLat(e.target.value ? Number(e.target.value) : null)}
-              required
-            />
-            <input
-              type="number"
-              step="any"
-              placeholder="Longitude"
-              value={lng ?? ''}
-              onChange={(e) => setLng(e.target.value ? Number(e.target.value) : null)}
-              required
-            />
-          </div>
+            <div className={styles.coordinateInputs}>
+              <input
+                className={styles.input}
+                type="number"
+                step="any"
+                placeholder="Latitude"
+                value={lat ?? ''}
+                onChange={(e) => setLat(e.target.value ? Number(e.target.value) : null)}
+                required
+              />
+              <input
+                className={styles.input}
+                type="number"
+                step="any"
+                placeholder="Longitude"
+                value={lng ?? ''}
+                onChange={(e) => setLng(e.target.value ? Number(e.target.value) : null)}
+                required
+              />
+            </div>
 
-          {/* Map picker placeholder */}
-          <div style={{ height: 240, border: '1px dashed #ccc', marginTop: 8 }}>
-            {/* TODO replace with a small map that sets lat,lng on click */}
-            <p style={{ padding: 8 }}>Map picker goes here</p>
+            <div className={styles.mapPlaceholder}>
+              Map picker goes here
+            </div>
           </div>
         </div>
 
         {/* Photo */}
-        <div>
-          <label htmlFor="photo">Photo</label>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="photo">Photo</label>
           <input
+            className={styles.fileInput}
             id="photo"
             ref={fileInputRef}
             type="file"
             accept="image/*"
             onChange={onFileChange}
           />
-          {/* TODO optional preview */}
         </div>
 
         {/* Actions */}
-        <div style={{ marginTop: 16 }}>
-          <button type="submit">Submit report</button>
+        <div className={styles.submitSection}>
+          <button type="submit" className={styles.submitButton}>
+            Submit report
+          </button>
         </div>
       </form>
     </main>

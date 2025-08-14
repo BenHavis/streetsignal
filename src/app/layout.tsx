@@ -26,15 +26,27 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <header>
-          <Link href="/" className="app-header">
-            StreetSignal
-          </Link>
+        <header className="navbar">
+          <div className="navbar-container">
+            <Link href="/" className="navbar-brand">
+              StreetSignal
+            </Link>
+            <nav className="navbar-nav">
+              <Link href="/report" className="nav-link">
+                Report Issue
+              </Link>
+              <Link href="/explore" className="nav-link">
+                Explore Map
+              </Link>
+              <Link href="/about" className="nav-link">
+                About
+              </Link>
+            </nav>
+          </div>
         </header>
         <main>{children}</main>
       </body>

@@ -1,59 +1,202 @@
+/* StreetsSignal Color Palette */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary Colors - Trust & Authority */
+  --primary-500: #1e40af;    /* Strong blue - main CTA buttons */
+  --primary-400: #3b82f6;    /* Medium blue - hover states */
+  --primary-300: #93c5fd;    /* Light blue - accents */
+  --primary-50: #eff6ff;     /* Very light blue - backgrounds */
+
+  /* Secondary Colors - Community & Growth */
+  --secondary-500: #059669;  /* Forest green - success states */
+  --secondary-400: #10b981;  /* Medium green - status indicators */
+  --secondary-300: #6ee7b7;  /* Light green - highlights */
+  --secondary-50: #ecfdf5;   /* Very light green - backgrounds */
+
+  /* Civic Red - Urgent Issues */
+  --urgent-500: #dc2626;     /* Red - urgent/high priority */
+  --urgent-400: #ef4444;     /* Medium red - warnings */
+  --urgent-50: #fef2f2;      /* Light red - error backgrounds */
+
+  /* Warning Orange - Caution */
+  --warning-500: #d97706;    /* Orange - in progress/caution */
+  --warning-400: #f59e0b;    /* Medium orange - alerts */
+  --warning-50: #fffbeb;     /* Light orange - warning backgrounds */
+
+  /* Neutrals - Clean & Professional */
+  --gray-900: #111827;       /* Dark text - headings */
+  --gray-700: #374151;       /* Medium text - body copy */
+  --gray-500: #6b7280;       /* Light text - subtitles */
+  --gray-300: #d1d5db;       /* Borders - form elements */
+  --gray-100: #f3f4f6;       /* Light backgrounds - cards */
+  --gray-50: #f9fafb;        /* Very light - page backgrounds */
+  --white: #ffffff;          /* Pure white - content areas */
+
+  /* Category Colors for Map Markers */
+  --category-road: #dc2626;        /* Red - urgent road issues */
+  --category-lighting: #f59e0b;    /* Amber - lighting issues */
+  --category-safety: #ef4444;      /* Red-orange - safety concerns */
+  --category-sanitation: #059669;  /* Green - environmental */
+  --category-accessibility: #3b82f6; /* Blue - accessibility */
+  --category-other: #6b7280;       /* Gray - general issues */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Usage Examples */
+
+/* Primary Actions */
+.button-primary {
+  background-color: var(--primary-500);
+  color: var(--white);
+}
+
+.button-primary:hover {
+  background-color: var(--primary-400);
+}
+
+/* Status Indicators */
+.status-open {
+  background-color: var(--gray-100);
+  color: var(--gray-700);
+}
+
+.status-in-progress {
+  background-color: var(--warning-50);
+  color: var(--warning-500);
+}
+
+.status-resolved {
+  background-color: var(--secondary-50);
+  color: var(--secondary-500);
+}
+
+.status-urgent {
+  background-color: var(--urgent-50);
+  color: var(--urgent-500);
+}
+
+/* Page Backgrounds */
+.page-background {
+  background-color: var(--gray-50);
+}
+
+.content-background {
+  background-color: var(--white);
+}
+
+.section-background {
+  background-color: var(--gray-100);
+}
+
+/* Text Hierarchy */
+.text-heading {
+  color: var(--gray-900);
+}
+
+.text-body {
+  color: var(--gray-700);
+}
+
+.text-subtle {
+  color: var(--gray-500);
+}
+
+/* Form Elements */
+.form-border {
+  border-color: var(--gray-300);
+}
+
+.form-focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+/* Navbar Styles */
+.navbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-500);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.navbar-brand:hover {
+  color: var(--primary-400);
+}
+
+.navbar-nav {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.nav-link {
+  color: var(--gray-700);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--primary-500);
+  background-color: var(--primary-50);
+}
+
+/* Active link styling */
+.nav-link.active {
+  color: var(--primary-500);
+  background-color: var(--primary-50);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 16px;
+    height: 56px;
+  }
+  
+  .navbar-brand {
+    font-size: 1.3rem;
+  }
+  
+  .navbar-nav {
+    gap: 16px;
+  }
+  
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 6px 12px;
   }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-    font-family: system-ui, sans-serif;
-  background-color: #e5e7eb;
-  color: #111827;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.app-header {
-  display: inline-block;
-  padding: 20px;
-  font-size: 1.6rem;
-  font-weight: bold;
-   color: white;
-  text-decoration: none;
-}
-header {
-  background-color: #111827; /* Tailwind 'gray-900' */
-}
-
-
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@media (max-width: 480px) {
+  .navbar-nav {
+    gap: 8px;
+  }
+  
+  .nav-link {
+    font-size: 0.85rem;
+    padding: 6px 8px;
   }
 }

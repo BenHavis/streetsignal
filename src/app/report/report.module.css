@@ -1,183 +1,294 @@
+/* Report Page Styles */
+.pageWrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+  padding: 40px 20px;
+}
+
 .container {
-  padding: 24px;
   max-width: 720px;
   margin: 0 auto;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
 .title {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 32px;
-  color: #1f2937;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--gray-900);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--gray-600);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.formCard {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--gray-200);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
+}
+
+.fieldGroup {
+  background: var(--gray-50);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-200);
+}
+
+.fieldGroup.basic {
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+.groupTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 20px;
+}
+
+.field:last-child {
+  margin-bottom: 0;
 }
 
 .label {
   font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
+  color: var(--gray-700);
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .input {
-  padding: 12px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border: 2px solid var(--gray-300);
+  border-radius: 10px;
   font-size: 1rem;
-  transition: border-color 0.15s ease;
-  background: white;
+  transition: all 0.2s ease;
+  background: var(--white);
 }
 
 .input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+  transform: translateY(-1px);
 }
 
 .input::placeholder {
-  color: #9ca3af;
+  color: var(--gray-500);
 }
 
 .select {
-  padding: 12px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border: 2px solid var(--gray-300);
+  border-radius: 10px;
   font-size: 1rem;
-  background: white;
+  background: var(--white);
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
 }
 
 .textarea {
-  padding: 12px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border: 2px solid var(--gray-300);
+  border-radius: 10px;
   font-size: 1rem;
   font-family: inherit;
   resize: vertical;
-  min-height: 100px;
-  transition: border-color 0.15s ease;
+  min-height: 120px;
+  transition: all 0.2s ease;
+  background: var(--white);
 }
 
 .textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
 }
 
 .locationSection {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .locationButton {
   align-self: flex-start;
-  padding: 10px 16px;
-  background: #f3f4f6;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
+  padding: 12px 20px;
+  background: var(--primary-500);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
-  color: #374151;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .locationButton:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
+  background: var(--primary-400);
+  transform: translateY(-1px);
 }
 
 .coordinateInputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
 .mapPlaceholder {
-  height: 240px;
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
+  height: 260px;
+  border: 2px dashed var(--gray-300);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f9fafb;
-  color: #6b7280;
+  background: var(--white);
+  color: var(--gray-500);
   font-style: italic;
+  transition: all 0.2s ease;
+}
+
+.mapPlaceholder:hover {
+  border-color: var(--primary-300);
+  background: var(--primary-50);
+}
+
+.fileInputWrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
 }
 
 .fileInput {
-  padding: 8px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  background: white;
-  font-size: 0.875rem;
+  padding: 14px 16px;
+  border: 2px solid var(--gray-300);
+  border-radius: 10px;
+  background: var(--white);
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
 .fileInput:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+.fileInput:hover {
+  border-color: var(--primary-400);
+}
+
+.photoPreview {
+  margin-top: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 200px;
+}
+
+.photoPreview img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .submitSection {
-  margin-top: 16px;
-  padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+  margin-top: 20px;
+  padding-top: 32px;
+  border-top: 2px solid var(--gray-100);
 }
 
 .submitButton {
   width: 100%;
-  padding: 16px;
-  background: #3b82f6;
-  color: white;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-400) 100%);
+  color: var(--white);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
 }
 
 .submitButton:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
 }
 
 .submitButton:active {
   transform: translateY(0);
 }
 
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .container {
-    padding: 16px;
+  .pageWrapper {
+    padding: 20px 16px;
+  }
+  
+  .formCard {
+    padding: 24px 20px;
   }
   
   .title {
-    font-size: 1.75rem;
-    margin-bottom: 24px;
+    font-size: 1.9rem;
+    margin-bottom: 8px;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .fieldGroup {
+    padding: 20px;
   }
   
   .coordinateInputs {
@@ -185,6 +296,11 @@
   }
   
   .mapPlaceholder {
-    height: 200px;
+    height: 220px;
+  }
+  
+  .submitButton {
+    padding: 16px;
+    font-size: 1rem;
   }
 }

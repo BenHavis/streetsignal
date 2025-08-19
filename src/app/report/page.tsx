@@ -45,8 +45,9 @@ export default function ReportPage() {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<Category>("Road");
   const [description, setDescription] = useState("");
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
+  const [userLatitude, setUserLatitude] = useState<number | null>(null);
+  const [userLongitude, setUserLongitude] = useState<number | null>(null);
+  const [location, setLocation] = useState<string>("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -248,9 +249,11 @@ export default function ReportPage() {
                       type="number"
                       step="any"
                       placeholder="42.3601"
-                      value={lat ?? ""}
+                      value={userLatitude ?? ""}
                       onChange={(e) =>
-                        setLat(e.target.value ? Number(e.target.value) : null)
+                        setUserLatitude(
+                          e.target.value ? Number(e.target.value) : null
+                        )
                       }
                       required
                     />
@@ -262,9 +265,11 @@ export default function ReportPage() {
                       type="number"
                       step="any"
                       placeholder="-71.0589"
-                      value={lng ?? ""}
+                      value={userLongitude ?? ""}
                       onChange={(e) =>
-                        setLng(e.target.value ? Number(e.target.value) : null)
+                        setUserLatitude(
+                          e.target.value ? Number(e.target.value) : null
+                        )
                       }
                       required
                     />

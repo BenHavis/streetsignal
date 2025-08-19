@@ -48,6 +48,7 @@ const CATEGORIES: Category[] = [
   "Other",
 ];
 
+
 export default function ReportPage() {
   // Form state
   const [title, setTitle] = useState("");
@@ -201,163 +202,207 @@ export default function ReportPage() {
   }
 
   return (
-    <div className={styles.pageWrapper}>
-      <main className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Report an Issue</h1>
-          <p className={styles.subtitle}>
-            Help improve your community by reporting infrastructure problems.
-            Your report will be visible to neighbors and local authorities.
-          </p>
-        </div>
+  <div className={styles.pageWrapper}>
+    <main className={styles.container}>
+      <header className={styles.header}>
+        <h1 className={styles.title}>Report an Issue</h1>
+        <p className={styles.subtitle}>
+          Help improve your community by reporting infrastructure problems.
+          Your report will be visible to neighbors and local authorities.
+        </p>
+      </header>
 
-        <div className={styles.formCard}>
-          <form className={styles.form} onSubmit={onSubmit}>
-            {/* Basic Information */}
-            <div className={`${styles.fieldGroup} ${styles.basic}`}>
-              <h3 className={styles.groupTitle}>📝 Basic Information</h3>
+      <div className={styles.formCard}>
+        <form className={styles.form} onSubmit={onSubmit} aria-label="Infrastructure issue report form">
+          {/* Basic Information */}
+          <fieldset className={`${styles.fieldGroup} ${styles.basic}`}>
+            <legend className={styles.groupTitle}>📝 Basic Information</legend>
 
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="title">
-                  Issue Title
-                </label>
-                <input
-                  className={styles.input}
-                  id="title"
-                  type="text"
-                  placeholder="e.g., Large pothole on Main Street"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="title">
+                Issue Title <span aria-label="required">*</span>
+              </label>
+              <input
+                className={styles.input}
+                id="title"
+                type="text"
+                placeholder="e.g., Large pothole on Main Street"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                aria-describedby="title-hint"
+                required
+              />
+              <small id="title-hint" className={styles.hint}>
+                Provide a clear, brief description of the issue
+              </small>
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="category">
+                Category <span aria-label="required">*</span>
+              </label>
+              <select
+                className={styles.select}
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as Category)}
+                aria-describedby="category-hint"
+                required
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <small id="category-hint" className={styles.hint}>
+                Select the type of infrastructure issue
+              </small>
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="description">
+                Description (Optional)
+              </label>
+              <textarea
+                className={styles.textarea}
+                id="description"
+                placeholder="Provide additional details about the issue..."
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                aria-describedby="description-hint"
+              />
+              <small id="description-hint" className={styles.hint}>
+                Add any additional context that might help local authorities understand the issue
+              </small>
+            </div>
+          </fieldset>
+
+          {/* Location */}
+          <fieldset className={styles.fieldGroup}>
+            <legend className={styles.groupTitle}>📍 Location</legend>
+
+            <div className={styles.locationSection}>
+              <button
+                type="button"
+                className={styles.locationButton}
+                onClick={useMyLocation}
+                aria-label="Get current location coordinates automatically"
+              >
+                🎯 Use My Current Location
+              </button>
+
+              <div className={styles.coordinateInputs} role="group" aria-labelledby="coordinates-label">
+                <h4 id="coordinates-label" className="sr-only">Geographic Coordinates</h4>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="latitude">
+                    Latitude <span aria-label="required">*</span>
+                  </label>
+                  <input
+                    className={styles.input}
+                    id="latitude"
+                    type="number"
+                    step="any"
+                    placeholder="42.3601"
+                    value={userLatitude ?? ""}
+                    onChange={(e) =>
+                      setUserLatitude(
+                        e.target.value ? Number(e.target.value) : null
+                      )
+                    }
+                    aria-describedby="latitude-hint"
+                    required
+                  />
+                  <small id="latitude-hint" className={styles.hint}>
+                    North-south position (e.g., 42.3601)
+                  </small>
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="longitude">
+                    Longitude <span aria-label="required">*</span>
+                  </label>
+                  <input
+                    className={styles.input}
+                    id="longitude"
+                    type="number"
+                    step="any"
+                    placeholder="-71.0589"
+                    value={userLongitude ?? ""}
+                    onChange={(e) =>
+                      setUserLongitude(
+                        e.target.value ? Number(e.target.value) : null
+                      )
+                    }
+                    aria-describedby="longitude-hint"
+                    required
+                  />
+                  <small id="longitude-hint" className={styles.hint}>
+                    East-west position (e.g., -71.0589)
+                  </small>
+                </div>
               </div>
 
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="category">
-                  Category
-                </label>
-                <select
-                  className={styles.select}
-                  id="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as Category)}
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="description">
-                  Description (Optional)
-                </label>
-                <textarea
-                  className={styles.textarea}
-                  id="description"
-                  placeholder="Provide additional details about the issue..."
-                  rows={4}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+              <div className={styles.mapPlaceholder} role="img" aria-label="Interactive map showing issue location">
+                <DynamicMap 
+                  mapCenter={mapCenter}
+                  userLatitude={userLatitude}
+                  userLongitude={userLongitude}
+                  location={location}
+                  className={styles.leafletMap}
                 />
               </div>
             </div>
+          </fieldset>
 
-            {/* Location */}
-            <div className={styles.fieldGroup}>
-              <h3 className={styles.groupTitle}>📍 Location</h3>
+          {/* Photo Upload */}
+          <fieldset className={styles.fieldGroup}>
+            <legend className={styles.groupTitle}>📸 Photo Evidence</legend>
 
-              <div className={styles.locationSection}>
-                <button
-                  type="button"
-                  className={styles.locationButton}
-                  onClick={useMyLocation}
-                >
-                  🎯 Use My Current Location
-                </button>
-
-                <div className={styles.coordinateInputs}>
-                  <div className={styles.field}>
-                    <label className={styles.label}>Latitude</label>
-                    <input
-                      className={styles.input}
-                      type="number"
-                      step="any"
-                      placeholder="42.3601"
-                      value={userLatitude ?? ""}
-                      onChange={(e) =>
-                        setUserLatitude(
-                          e.target.value ? Number(e.target.value) : null
-                        )
-                      }
-                      required
-                    />
-                  </div>
-                  <div className={styles.field}>
-                    <label className={styles.label}>Longitude</label>
-                    <input
-                      className={styles.input}
-                      type="number"
-                      step="any"
-                      placeholder="-71.0589"
-                      value={userLongitude ?? ""}
-                      onChange={(e) =>
-                        setUserLongitude(
-                          e.target.value ? Number(e.target.value) : null
-                        )
-                      }
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.mapPlaceholder}>
-                  <DynamicMap 
-                    mapCenter={mapCenter}
-                    userLatitude={userLatitude}
-                    userLongitude={userLongitude}
-                    location={location}
-                    className={styles.leafletMap}
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="photo">
+                Upload Photo (Optional)
+              </label>
+              <input
+                className={styles.fileInput}
+                id="photo"
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={onFileChange}
+                aria-describedby="photo-hint"
+              />
+              <small id="photo-hint" className={styles.hint}>
+                Add a photo to help illustrate the issue. JPEG and PNG files only.
+              </small>
+              {photoFile && (
+                <div className={styles.photoPreview} role="img" aria-label="Photo preview">
+                  <img 
+                    src={URL.createObjectURL(photoFile)} 
+                    alt={`Preview of uploaded photo: ${photoFile.name}`}
                   />
                 </div>
-              </div>
+              )}
             </div>
+          </fieldset>
 
-            {/* Photo Upload */}
-            <div className={styles.fieldGroup}>
-              <h3 className={styles.groupTitle}>📸 Photo Evidence</h3>
+          {/* Submit */}
+          <section className={styles.submitSection}>
+            <button 
+              type="submit" 
+              className={styles.submitButton}
+              aria-describedby="submit-hint"
+            >
+              🚀 Submit Report
+            </button>
+            <small id="submit-hint" className={styles.hint}>
+              Your report will be reviewed and shared with local authorities
+            </small>
+          </section>
+        </form>
+      </div>
+    </main>
+  </div>
+);
 
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="photo">
-                  Upload Photo (Optional)
-                </label>
-                <input
-                  className={styles.fileInput}
-                  id="photo"
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={onFileChange}
-                />
-                {photoFile && (
-                  <div className={styles.photoPreview}>
-                    <img src={URL.createObjectURL(photoFile)} alt="Preview" />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Submit */}
-            <div className={styles.submitSection}>
-              <button type="submit" className={styles.submitButton}>
-                🚀 Submit Report
-              </button>
-            </div>
-          </form>
-        </div>
-      </main>
-    </div>
-  );
 }

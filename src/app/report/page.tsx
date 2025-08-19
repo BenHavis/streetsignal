@@ -158,10 +158,47 @@ export default function ReportPage() {
     setPhotoFile(f);
   }
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    alert("TODO: submit report");
+async function onSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  
+  console.log('=== FORM SUBMISSION DEBUG ===');
+  console.log('Title:', title);
+  console.log('Category:', category);
+  console.log('Description:', description);
+  console.log('Latitude:', userLatitude);
+  console.log('Longitude:', userLongitude);
+  console.log('Location:', location);
+  
+  // Photo analysis using helper
+  if (photoFile) {
+    const analysis = await analyzePhoto(photoFile);
+    const validation = validatePhoto(analysis);
+    
+    logPhotoAnalysis(analysis);
+    
+    console.log('=== VALIDATION RESULT ===');
+    console.log('Valid:', validation.isValid);
+    console.log('Auto Approve:', validation.shouldAutoApprove);
+    console.log('Needs Review:', validation.flaggedForReview);
+    if (validation.reasons.length > 0) {
+      console.log('Issues:', validation.reasons);
+    }
+    
+    if (validation.shouldAutoApprove) {
+      console.log('✅ Photo would be auto-approved');
+    } else if (validation.flaggedForReview) {
+      console.log('⚠️ Photo flagged for manual review');
+    } else {
+      console.log('❌ Photo rejected');
+    }
   }
+  
+  const isValid = title.trim() && userLatitude !== null && userLongitude !== null;
+  console.log('Form is valid:', isValid);
+  console.log('=== END DEBUG ===');
+  
+  alert('Check console for detailed analysis!');
+}
 
   return (
     <div className={styles.pageWrapper}>

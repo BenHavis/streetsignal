@@ -1,7 +1,8 @@
 // app/report/page.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import dynamic from 'next/dynamic';
 import styles from "./report.module.css";
 import {
   analyzePhoto,
@@ -9,11 +10,27 @@ import {
   logPhotoAnalysis,
 } from "../../../lib/photoValidator";
 import { supabase } from "../../../lib/supabase";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import { LatLngExpression } from "leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 
+// Dynamic import with SSR disabled
+const DynamicMap = dynamic(() => import('./MapComponent'), {
+  ssr: false,
+  loading: () => (
+    <div className={styles.mapPlaceholder}>
+      <div style={{ 
+        height: '260px', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        border: '2px dashed #ccc',
+        borderRadius: '12px',
+        backgroundColor: '#f9f9f9',
+        color: '#666'
+      }}>
+        Loading map...
+      </div>
+    </div>
+  )
+});
 
 type Category =
   | "Road"
@@ -42,31 +59,13 @@ export default function ReportPage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const defaultCenter: LatLngExpression = [40.7128, -74.006];
-
-  useEffect(() => {
-  // Fix Leaflet icons only on client side
-  delete (L.Icon.Default.prototype as any)._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-  });
-}, []);
+  const defaultCenter: [number, number] = [40.7128, -74.006];
 
   // Use user location if available, otherwise default
-  const mapCenter: LatLngExpression =
+  const mapCenter: [number, number] =
     userLatitude !== null && userLongitude !== null
       ? [userLatitude, userLongitude]
       : defaultCenter;
-
-  function RecenterOnLocation({ coords }: { coords: LatLngExpression }) {
-    const map = useMap();
-    useEffect(() => {
-      map.setView(coords);
-    }, [coords, map]);
-    return null;
-  }
 
   const useMyLocation = async () => {
     console.log("[useMyLocation] Called");
@@ -315,26 +314,13 @@ export default function ReportPage() {
                 </div>
 
                 <div className={styles.mapPlaceholder}>
-                  <MapContainer
-                    center={mapCenter}
-                    zoom={13}
-                    scrollWheelZoom
+                  <DynamicMap 
+                    mapCenter={mapCenter}
+                    userLatitude={userLatitude}
+                    userLongitude={userLongitude}
+                    location={location}
                     className={styles.leafletMap}
-                    key={`${userLatitude}-${userLongitude}`}
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution="&copy; OpenStreetMap contributors"
-                    />
-                    <Marker position={mapCenter}>
-                      <Popup>
-                        {location ? "Your location" : "Default (NYC)"}
-                      </Popup>
-                    </Marker>
-                    {userLatitude !== null && userLongitude !== null && (
-                      <RecenterOnLocation coords={mapCenter} />
-                    )}
-                  </MapContainer>
+                  />
                 </div>
               </div>
             </div>

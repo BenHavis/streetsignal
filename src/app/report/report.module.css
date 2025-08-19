@@ -173,18 +173,19 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
-
 .mapPlaceholder {
   height: 260px;
-  border: 2px dashed var(--gray-300);
+  border: 2px solid var(--gray-300);
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden; /* Add this */
+  position: relative; /* Add this */
   background: var(--white);
-  color: var(--gray-500);
-  font-style: italic;
-  transition: all 0.2s ease;
+}
+
+.leafletMap {
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 10px;
 }
 
 .mapPlaceholder:hover {

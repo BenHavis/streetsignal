@@ -3,6 +3,8 @@
 
 import { useState, useRef } from 'react';
 import styles from './report.module.css'
+import { analyzePhoto, validatePhoto, logPhotoAnalysis } from '../../../lib/photoValidator';
+import { supabase } from '../../../lib/supabase';
 
 type Category = 'Road' | 'Lighting' | 'Safety' | 'Sanitation' | 'Accessibility' | 'Other';
 const CATEGORIES: Category[] = ['Road', 'Lighting', 'Safety', 'Sanitation', 'Accessibility', 'Other'];
@@ -12,25 +14,142 @@ export default function ReportPage() {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<Category>('Road');
   const [description, setDescription] = useState('');
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
+    const [location, setLocation] = useState<string>("");
+  const [userLatitude, setUserLatitude] = useState<number | null>(null);
+  const [userLongitude, setUserLongitude] = useState<number | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  function useMyLocation() {
-    // TODO request geolocation, set lat and lng
-    alert('TODO: Use my location');
+    // define the function that finds the users geolocation
+  const getUserLocation = () => {
+ 
+  };
+
+
+const useMyLocation = async () => {
+  console.log("[useMyLocation] Called");
+
+  // Check if geolocation is supported
+  if (!navigator.geolocation) {
+    console.error("[useMyLocation] Geolocation is not supported by this browser.");
+    alert("Geolocation is not supported by your browser.");
+    return;
   }
+
+  console.log("[useMyLocation] Geolocation is supported. Checking permission status...");
+
+  // Check current permission status if available
+  if (navigator.permissions) {
+    try {
+      const permission = await navigator.permissions.query({ name: 'geolocation' });
+      console.log("[useMyLocation] Current permission status:", permission.state);
+      
+      if (permission.state === 'denied') {
+        console.log("[useMyLocation] Permission is denied - showing instructions");
+        alert("Location access is blocked. Please enable location permissions in your browser settings and refresh the page.");
+        return;
+      }
+    } catch (permissionError) {
+      console.log("[useMyLocation] Permission API not fully supported, proceeding with location request");
+    }
+  }
+
+  console.log("[useMyLocation] Requesting position with 5 second timeout...");
+
+  // Use shorter timeout to catch silent failures quickly
+  const options = {
+    enableHighAccuracy: false, // Try network-based location first (faster)
+    timeout: 5000, // 5 seconds timeout
+    maximumAge: 60000 // Accept cached position up to 1 minute old
+  };
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      console.log("[useMyLocation] Position retrieved successfully:", position);
+
+      const { latitude, longitude } = position.coords;
+      console.log(`[useMyLocation] Coordinates: latitude=${latitude}, longitude=${longitude}`);
+
+      setUserLatitude(latitude);
+      console.log("[useMyLocation] setUserLatitude called with:", latitude);
+
+      setUserLongitude(longitude);
+      console.log("[useMyLocation] setUserLongitude called with:", longitude);
+    },
+    (error) => {
+      console.error("[useMyLocation] Error getting user location:", error);
+      console.log("[useMyLocation] Error code:", error.code);
+      console.log("[useMyLocation] Error message:", error.message);
+      
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          console.log("[useMyLocation] Location access was denied");
+          alert("Location access was denied. Please enable location permissions in your browser and try again.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          console.log("[useMyLocation] Location information is unavailable");
+          alert("Location information is unavailable. Please check that location services are enabled on your device.");
+          break;
+        case error.TIMEOUT:
+          console.log("[useMyLocation] Location request timed out");
+          alert("Location request timed out. Please try again.");
+          break;
+        default:
+          console.log("[useMyLocation] Unknown error occurred");
+          alert("Unable to get your location. Please check your browser's location permissions.");
+          break;
+      }
+    },
+    options
+  );
+};
 
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
     setPhotoFile(f);
   }
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    alert('TODO: submit report');
+// Update your onSubmit function:
+async function onSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  
+  console.log('=== FORM SUBMISSION DEBUG ===');
+  console.log('Title:', title);
+  console.log('Category:', category);
+  console.log('Description:', description);
+  console.log('Latitude:', userLatitude);
+  console.log('Longitude:', userLongitude);
+  
+  // Photo analysis using helper
+  if (photoFile) {
+    const analysis = await analyzePhoto(photoFile);
+    const validation = validatePhoto(analysis);
+    
+    logPhotoAnalysis(analysis);
+    
+    console.log('=== VALIDATION RESULT ===');
+    console.log('Valid:', validation.isValid);
+    console.log('Auto Approve:', validation.shouldAutoApprove);
+    console.log('Needs Review:', validation.flaggedForReview);
+    if (validation.reasons.length > 0) {
+      console.log('Issues:', validation.reasons);
+    }
+    
+    if (validation.shouldAutoApprove) {
+      console.log('✅ Photo would be auto-approved');
+    } else if (validation.flaggedForReview) {
+      console.log('⚠️ Photo flagged for manual review');
+    } else {
+      console.log('❌ Photo rejected');
+    }
   }
+  
+  const isValid = title.trim() && userLatitude !== null && userLongitude !== null;
+  console.log('Form is valid:', isValid);
+  console.log('=== END DEBUG ===');
+  
+  alert('Check console for detailed analysis!');
+}
 
   return (
     <div className={styles.pageWrapper}>
@@ -107,8 +226,8 @@ export default function ReportPage() {
                       type="number"
                       step="any"
                       placeholder="42.3601"
-                      value={lat ?? ''}
-                      onChange={(e) => setLat(e.target.value ? Number(e.target.value) : null)}
+                      value={userLatitude ?? ''}
+                      onChange={(e) => setUserLatitude(e.target.value ? Number(e.target.value) : null)}
                       required
                     />
                   </div>
@@ -119,8 +238,8 @@ export default function ReportPage() {
                       type="number"
                       step="any"
                       placeholder="-71.0589"
-                      value={lng ?? ''}
-                      onChange={(e) => setLng(e.target.value ? Number(e.target.value) : null)}
+                      value={userLongitude ?? ''}
+                      onChange={(e) => setUserLongitude(e.target.value ? Number(e.target.value) : null)}
                       required
                     />
                   </div>

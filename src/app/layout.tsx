@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'StreetSignal',
     description: 'Report and view local community issues on a shared map.',
-    url: 'https://yourdomain.com',
+    url: 'https://streetsignal.com',
     images: [
       {
         url: '/og-image.png',

@@ -1,8 +1,9 @@
-// app/report/ReportForm.tsx
 "use client";
 
 import { useState, useRef, Suspense, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { createClient } from "../../../utils/supabase/client";
+import { v4 as uuidv4 } from 'uuid';
 import styles from "./report.module.css";
 
 // Load Map only on the client, outside the main bundle
@@ -42,6 +43,37 @@ const CATEGORIES: Category[] = [
   "Other",
 ];
 
+async function uploadPhoto(file: File): Promise<string | null> {
+  const supabase = createClient();
+  
+  // Generate unique folder name (this will be your photo ID)
+  const photoId = uuidv4();
+  
+  // Get file extension
+  const fileExt = file.name.split('.').pop()?.toLowerCase();
+  const fileName = `photo.${fileExt}`;
+  
+  // Upload to reports-photo bucket with folder structure
+  const { data, error } = await supabase.storage
+    .from('report-photos')
+    .upload(`${photoId}/${fileName}`, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (error) {
+    console.error('Photo upload error:', error);
+    return null;
+  }
+
+  // Get the public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('reports-photo')
+    .getPublicUrl(`${photoId}/${fileName}`);
+
+  return publicUrl;
+}
+
 export default function ReportForm() {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<Category>("Road");
@@ -50,6 +82,7 @@ export default function ReportForm() {
   const [userLongitude, setUserLongitude] = useState<number | null>(null);
   const [location, setLocation] = useState<string>("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const defaultCenter: [number, number] = [40.7128, -74.006];
@@ -100,28 +133,85 @@ export default function ReportForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    // Lazy-load only when needed
-    if (photoFile) {
-      const { analyzePhoto, validatePhoto, logPhotoAnalysis } =
-        await import("../../../lib/photoValidator");
-      const analysis = await analyzePhoto(photoFile);
-      const validation = validatePhoto(analysis);
-      logPhotoAnalysis(analysis);
-
-      if (!validation.isValid) {
-        alert(`Photo issue: ${validation.reasons.join(", ")}`);
-        return;
-      }
-    }
-
+    // Validate required fields
     const isValid = title.trim() && userLatitude !== null && userLongitude !== null;
     if (!isValid) {
       alert("Please add a title and location.");
+      setIsSubmitting(false);
       return;
     }
 
-    alert("Submitted! (wire up server action or API next)");
+    let photoUrl: string | null = null;
+
+    try {
+      // Handle photo upload if file exists
+      if (photoFile) {
+        // Lazy-load photo validation
+        const { analyzePhoto, validatePhoto, logPhotoAnalysis } =
+          await import("../../../lib/photoValidator");
+        const analysis = await analyzePhoto(photoFile);
+        const validation = validatePhoto(analysis);
+        logPhotoAnalysis(analysis);
+
+
+        if (!validation.isValid) {
+          alert(`Photo issue: ${validation.reasons.join(", ")}`);
+         setIsSubmitting(false);
+         return;
+        }
+
+        // Upload photo and get URL
+        photoUrl = await uploadPhoto(photoFile);
+        
+        if (!photoUrl) {
+          alert("Failed to upload photo. Please try again.");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Create the report with photo URL
+      const supabase = createClient();
+
+      const { data, error } = await supabase.rpc('create_report', {
+        p_title: title.trim(),
+        p_category: category,
+        p_description: description.trim() || null,
+        p_lat: userLatitude,
+        p_lng: userLongitude,
+        p_address: location,
+        p_photo_url: photoUrl
+      });
+
+      if (error) {
+        console.error('Error creating report:', error);
+        alert("Failed to submit report. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Success! Reset form
+      setTitle("");
+      setCategory("Road");
+      setDescription("");
+      setUserLatitude(null);
+      setUserLongitude(null);
+      setLocation("");
+      setPhotoFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      alert("Report submitted successfully!");
+
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert("An error occurred while submitting the report. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -131,7 +221,6 @@ export default function ReportForm() {
           <h1 className={styles.title}>Report an Issue</h1>
           <p className={styles.subtitle}>
             Help improve your community by reporting infrastructure problems.
-            Your report will be visible to neighbors and local authorities.
           </p>
         </header>
 
@@ -153,6 +242,7 @@ export default function ReportForm() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   aria-describedby="title-hint"
+                  disabled={isSubmitting}
                   required
                 />
                 <small id="title-hint" className={styles.hint}>
@@ -170,6 +260,7 @@ export default function ReportForm() {
                   value={category}
                   onChange={(e) => setCategory(e.target.value as Category)}
                   aria-describedby="category-hint"
+                  disabled={isSubmitting}
                   required
                 >
                   {CATEGORIES.map((c) => (
@@ -193,6 +284,7 @@ export default function ReportForm() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   aria-describedby="description-hint"
+                  disabled={isSubmitting}
                 />
                 <small id="description-hint" className={styles.hint}>
                   Add any additional context that might help local authorities understand the issue
@@ -209,6 +301,7 @@ export default function ReportForm() {
                   type="button"
                   className={styles.locationButton}
                   onClick={useMyLocation}
+                  disabled={isSubmitting}
                   aria-label="Get current location coordinates automatically"
                 >
                   🎯 Use My Current Location
@@ -216,7 +309,6 @@ export default function ReportForm() {
 
                 <div className={styles.coordinateInputs} role="group" aria-labelledby="coordinates-label">
                  <h4 id="coordinates-label" className={styles.srOnly}>
-
                     Geographic Coordinates</h4>
                   <div className={styles.field}>
                     <label className={styles.label} htmlFor="latitude">
@@ -231,6 +323,7 @@ export default function ReportForm() {
                       value={userLatitude ?? ""}
                       onChange={(e) => setUserLatitude(e.target.value ? Number(e.target.value) : null)}
                       aria-describedby="latitude-hint"
+                      disabled={isSubmitting}
                       required
                     />
                     <small id="latitude-hint" className={styles.hint}>
@@ -250,6 +343,7 @@ export default function ReportForm() {
                       value={userLongitude ?? ""}
                       onChange={(e) => setUserLongitude(e.target.value ? Number(e.target.value) : null)}
                       aria-describedby="longitude-hint"
+                      disabled={isSubmitting}
                       required
                     />
                     <small id="longitude-hint" className={styles.hint}>
@@ -288,6 +382,7 @@ export default function ReportForm() {
                   accept="image/*"
                   onChange={onFileChange}
                   aria-describedby="photo-hint"
+                  disabled={isSubmitting}
                 />
                 <small id="photo-hint" className={styles.hint}>
                   Add a photo to help illustrate the issue. JPEG and PNG files only.
@@ -305,8 +400,13 @@ export default function ReportForm() {
 
             {/* Submit */}
             <section className={styles.submitSection}>
-              <button type="submit" className={styles.submitButton} aria-describedby="submit-hint">
-                🚀 Submit Report
+              <button 
+                type="submit" 
+                className={styles.submitButton} 
+                aria-describedby="submit-hint"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "🔄 Submitting..." : "🚀 Submit Report"}
               </button>
               <small id="submit-hint" className={styles.hint}>
                 Your report will be reviewed and shared with local authorities

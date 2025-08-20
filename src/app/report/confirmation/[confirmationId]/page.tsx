@@ -1,14 +1,13 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import styles from "./confirmation.module.css";
 
-export default function ReportConfirmation({
-  params,
-}: {
-  params: { confirmationId: string };
-}) {
-  const displayId = `RPT-${params.confirmationId.split("-")[0].toUpperCase()}`;
+export default function ReportConfirmation() {
+  const { confirmationId } = useParams<{ confirmationId: string }>();
+  const displayId = `RPT-${confirmationId.split("-")[0].toUpperCase()}`;
+
 
   return (
     <div className={styles.pageWrapper}>

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.55.0",
     "@vercel/analytics": "^1.5.0",
     "exifreader": "^4.31.1",
@@ -18,7 +19,8 @@
     "react": "^19.0.0-rc.1",
     "react-dom": "^19.0.0-rc.1",
     "react-leaflet": "^5.0.0-rc.2",
-    "react-use": "^17.6.0"
+    "react-use": "^17.6.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.18",

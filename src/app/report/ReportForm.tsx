@@ -2,6 +2,7 @@
 
 import { useState, useRef, Suspense, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from 'next/navigation'
 import { createClient } from "../../../utils/supabase/client";
 import { v4 as uuidv4 } from 'uuid';
 import styles from "./report.module.css";
@@ -68,7 +69,7 @@ async function uploadPhoto(file: File): Promise<string | null> {
 
   // Get the public URL
   const { data: { publicUrl } } = supabase.storage
-    .from('reports-photo')
+    .from('report-photos')
     .getPublicUrl(`${photoId}/${fileName}`);
 
   return publicUrl;
@@ -84,6 +85,8 @@ export default function ReportForm() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const router = useRouter()
+
 
   const defaultCenter: [number, number] = [40.7128, -74.006];
   const mapCenter: [number, number] =
@@ -131,89 +134,97 @@ export default function ReportForm() {
     setPhotoFile(e.target.files?.[0] ?? null);
   }
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsSubmitting(true);
+async function onSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    // Validate required fields
-    const isValid = title.trim() && userLatitude !== null && userLongitude !== null;
-    if (!isValid) {
-      alert("Please add a title and location.");
-      setIsSubmitting(false);
-      return;
-    }
+  // Validate required fields
+  const isValid = title.trim() && userLatitude !== null && userLongitude !== null;
+  if (!isValid) {
+    alert("Please add a title and location.");
+    setIsSubmitting(false);
+    return;
+  }
 
-    let photoUrl: string | null = null;
+  let photoUrl: string | null = null;
+  let validation: any = null;
 
-    try {
-      // Handle photo upload if file exists
-      if (photoFile) {
-        // Lazy-load photo validation
-        const { analyzePhoto, validatePhoto, logPhotoAnalysis } =
-          await import("../../../lib/photoValidator");
-        const analysis = await analyzePhoto(photoFile);
-        const validation = validatePhoto(analysis);
-        logPhotoAnalysis(analysis);
+  try {
+    // Handle photo upload if file exists
+    if (photoFile) {
+      // Lazy-load photo validation
+      const { analyzePhoto, validatePhoto, logPhotoAnalysis } =
+        await import("../../../lib/photoValidator");
+      const analysis = await analyzePhoto(photoFile);
+      validation = validatePhoto(analysis);
+      logPhotoAnalysis(analysis);
 
+      // Log the entire validation object
+      console.log('=== FULL VALIDATION OBJECT ===');
+      console.log(validation);
+      console.log('===============================');
 
-        if (!validation.isValid) {
-          alert(`Photo issue: ${validation.reasons.join(", ")}`);
-         setIsSubmitting(false);
-         return;
-        }
-
-        // Upload photo and get URL
-        photoUrl = await uploadPhoto(photoFile);
-        
-        if (!photoUrl) {
-          alert("Failed to upload photo. Please try again.");
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      // Create the report with photo URL
-      const supabase = createClient();
-
-      const { data, error } = await supabase.rpc('create_report', {
-        p_title: title.trim(),
-        p_category: category,
-        p_description: description.trim() || null,
-        p_lat: userLatitude,
-        p_lng: userLongitude,
-        p_address: location,
-        p_photo_url: photoUrl
-      });
-
-      if (error) {
-        console.error('Error creating report:', error);
-        alert("Failed to submit report. Please try again.");
+      if (!validation.isValid) {
+        alert(`Photo issue: ${validation.reasons.join(", ")}`);
         setIsSubmitting(false);
         return;
       }
 
-      // Success! Reset form
-      setTitle("");
-      setCategory("Road");
-      setDescription("");
-      setUserLatitude(null);
-      setUserLongitude(null);
-      setLocation("");
-      setPhotoFile(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+      // Upload photo and get URL
+      photoUrl = await uploadPhoto(photoFile);
+      
+      if (!photoUrl) {
+        alert("Failed to upload photo. Please try again.");
+        setIsSubmitting(false);
+        return;
       }
-
-      alert("Report submitted successfully!");
-
-    } catch (error) {
-      console.error('Submission error:', error);
-      alert("An error occurred while submitting the report. Please try again.");
-    } finally {
-      setIsSubmitting(false);
     }
-  }
 
+    // Create the report with photo URL and validation results
+    const supabase = createClient();
+
+    const { data, error } = await supabase.rpc('create_report', {
+      p_title: title.trim(),
+      p_category: category,
+      p_description: description.trim() || null,
+      p_lat: userLatitude,
+      p_lng: userLongitude,
+      p_address: location,
+      p_photo_url: photoUrl,
+      p_is_verified: photoFile ? validation.shouldAutoApprove : true,
+      p_is_spam: false
+    });
+
+    if (error) {
+      console.error('Error creating report:', error);
+      alert("Failed to submit report. Please try again.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Success! Reset form
+    setTitle("");
+    setCategory("Road");
+    setDescription("");
+    setUserLatitude(null);
+    setUserLongitude(null);
+    setLocation("");
+    setPhotoFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+     // Success! Redirect to confirmation page
+    console.log('Report created successfully, redirecting to confirmation:', data?.id);
+    router.push(`/report/confirmation/${data?.id}`);
+
+  } catch (error) {
+    console.error('Submission error:', error);
+    alert("An error occurred while submitting the report. Please try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+}
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.container}>

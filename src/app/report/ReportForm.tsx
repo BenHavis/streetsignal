@@ -420,7 +420,7 @@ async function onSubmit(e: React.FormEvent) {
                 {isSubmitting ? "🔄 Submitting..." : "🚀 Submit Report"}
               </button>
               <small id="submit-hint" className={styles.hint}>
-                Your report will be reviewed and shared with local authorities
+  This is not an official report with city authorities. Your submission will appear on the community map for awareness.
               </small>
             </section>
           </form>
